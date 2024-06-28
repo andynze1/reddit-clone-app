@@ -3,7 +3,7 @@ def COLOR_MAP = [
     'FAILURE': 'danger',
     'UNSTABLE': 'warning',
     'ABORTED': '#808080'
-]
+    ]
 
 pipeline {
     agent any
@@ -141,11 +141,7 @@ pipeline {
                 slackSend (
                     channel: '#jenkinscicd',
                     color: color,
-                    message: "*${currentBuild.currentResult}:* Job ${env.JOB_NAME} build ${env.BUILD_NUMBER} \nMore info at: ${env.BUILD_URL}",
-                    notifyCommitters: false,
-                    iconEmoji: '',
-                    username: '',
-                    timestamp: ''
+                    message: "*${currentBuild.currentResult}:* Job ${env.JOB_NAME} build ${env.BUILD_NUMBER} \nMore info at: ${env.BUILD_URL}"
                 )
             }
         }
