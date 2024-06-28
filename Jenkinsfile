@@ -13,7 +13,7 @@ pipeline {
     }
     environment {
         SCANNER_HOME = tool 'sonar-scanner'
-        APP_NAME = "reddit-clone-pipeline"
+        APP_NAME = "reddit-clone-app"
         RELEASE = "1.0.0"
         DOCKER_USER = "andynze4"
         DOCKER_PASS = 'dockerhub'
@@ -60,27 +60,27 @@ pipeline {
                 }
             }
         }
-        // stage ('Publish to Nexus Repository Manager') {
-        //     steps {
-        //         nexusArtifactUploader (
-        //             nexusVersion: "${NEXUS_VERSION}",
-        //             protocol: "${NEXUS_PROTOCOL}",
-        //             nexusUrl: "${NEXUSIP}:${NEXUSPORT}",
-        //             groupId: "${NEXUS_REPOGRP_ID}",
-        //             version: "${env.BUILD_ID}-${env.BUILD_TIMESTAMP}",
-        //             repository: "${RELEASE_REPO}",
-        //             credentialsId: "${NEXUS_LOGIN}",
-        //             artifacts: [
-        //                 [
-        //                     artifactId: 'webapp',
-        //                     classifier: '',
-        //                     file: 'target/webapp.war',
-        //                     type: 'war'
-        //                 ]
-        //             ]
-        //         )
-        //     }
-        // }
+        stage ('Publish to Nexus Repository Manager') {
+            steps {
+                nexusArtifactUploader (
+                    nexusVersion: "${NEXUS_VERSION}",
+                    protocol: "${NEXUS_PROTOCOL}",
+                    nexusUrl: "${NEXUSIP}:${NEXUSPORT}",
+                    groupId: "${NEXUS_REPOGRP_ID}",
+                    version: "${env.BUILD_ID}-${env.BUILD_TIMESTAMP}",
+                    repository: "${RELEASE_REPO}",
+                    credentialsId: "${NEXUS_LOGIN}",
+                    artifacts: [
+                        [
+                            artifactId: 'reddit-clone-app',
+                            classifier: '',
+                            file: 'target/reddit-clone-app.war',
+                            type: 'war'
+                        ]
+                    ]
+                )
+            }
+        }
         stage('Install Dependencies') {
             steps {
                 sh "npm install"
