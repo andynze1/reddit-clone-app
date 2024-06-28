@@ -8,7 +8,7 @@ def COLOR_MAP = [
 pipeline {
     agent any
     tools {
-        jdk 'jdk17'
+        jdk 'openjdk17'
         nodejs 'node16'
     }
     environment {
