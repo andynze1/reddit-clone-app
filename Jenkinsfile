@@ -10,6 +10,7 @@ pipeline {
     tools {
         jdk 'jdk17'
         nodejs 'node16'
+        git 'Default'
     }
     environment {
         SCANNER_HOME = tool 'sonar-scanner'
