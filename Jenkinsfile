@@ -1,3 +1,10 @@
+def COLOR_MAP = [
+    'SUCCESS': 'good',
+    'FAILURE': 'danger',
+    'UNSTABLE': 'warning',
+    'ABORTED': '#808080'
+]
+
 pipeline {
     agent any
     tools {
@@ -87,15 +94,19 @@ pipeline {
     //      }
      }
      post {
-        always {
-           emailext attachLog: true,
-               subject: "'${currentBuild.result}'",
-               body: "Project: ${env.JOB_NAME}<br/>" +
-                   "Build Number: ${env.BUILD_NUMBER}<br/>" +
-                   "URL: ${env.BUILD_URL}<br/>",
-               to: 'ashfaque.s510@gmail.com',                              
-               attachmentsPattern: 'trivyfs.txt,trivyimage.txt'
-        }
+        script {
+                def color = COLOR_MAP.get(currentBuild.currentResult, '#808080') // Default to gray if result not in map
+                echo 'Slack Notification.'
+                slackSend (
+                    channel: '#jenkinscicd',
+                    color: color,
+                    message: "*${currentBuild.currentResult}:* Job ${env.JOB_NAME} build ${env.BUILD_NUMBER} \nMore info at: ${env.BUILD_URL}",
+                    notifyCommitters: false,
+                    iconEmoji: '',
+                    username: '',
+                    timestamp: ''
+                )
+            }
      }
 }
 
