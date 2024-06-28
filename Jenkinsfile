@@ -22,12 +22,12 @@ pipeline {
 //        JENKINS_API_TOKEN = credentials("JENKINS_API_TOKEN")
         RELEASE_REPO = 'reddit-clone-release'
         CENTRAL_REPO = 'reddit-clone-maven-central'
-        NEXUSIP = '172.31.63.173'
+        NEXUSIP = '172.16.226.100'
         NEXUSPORT = '8081'
         NEXUS_GRP_REPO = 'reddit-clone-maven-group'
         NEXUS_LOGIN = 'nexuslogin'
         NEXUS_PROTOCOL = 'http'
-        NEXUS_URL = 'http://172.31.63.173:8081'
+        NEXUS_URL = 'http://172.16.226.100:8081'
         NEXUS_REPOGRP_ID = 'QA'
         NEXUS_VERSION = 'nexus3'
     }
