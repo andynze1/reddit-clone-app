@@ -30,6 +30,7 @@ pipeline {
         NEXUS_URL = 'http://172.16.226.100:8081'
         NEXUS_REPOGRP_ID = 'QA'
         NEXUS_VERSION = 'nexus3'
+        JENKINS_API_TOKEN = credentials("JENKINS_API_TOKEN")
     }
     stages {
         stage('Clean Workspace') {
