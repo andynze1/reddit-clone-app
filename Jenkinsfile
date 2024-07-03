@@ -124,7 +124,7 @@ pipeline {
         stage("Trigger CD Pipeline") {
             steps {
                 sh '''
-                curl -v -k --user user1 -X POST \
+                curl -v -k --user admin:${JENKINS_API_TOKEN} -X POST \
                 -H 'cache-control: no-cache' -H 'content-type: application/x-www-form-urlencoded' \
                 --data 'IMAGE_TAG=${IMAGE_TAG}' \
                 '172.16.226.100:8080/job/Reddit-Clone-CD/buildWithParameters?token=gitops-token'
