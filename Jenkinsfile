@@ -19,18 +19,7 @@ pipeline {
         DOCKER_PASS = 'dockerhub'
         IMAGE_NAME = "${DOCKER_USER}/${APP_NAME}"
         IMAGE_TAG = "${RELEASE}-${BUILD_NUMBER}"
-//        JENKINS_API_TOKEN = credentials("JENKINS_API_TOKEN")
-        RELEASE_REPO = 'reddit-clone-release'
-        CENTRAL_REPO = 'reddit-clone-maven-central'
-        NEXUSIP = '172.16.226.100'
-        NEXUSPORT = '8081'
-        NEXUS_GRP_REPO = 'reddit-clone-maven-group'
-        NEXUS_LOGIN = 'nexuslogin'
-        NEXUS_PROTOCOL = 'http'
-        NEXUS_URL = 'http://172.16.226.100:8081'
-        NEXUS_REPOGRP_ID = 'QA'
-        NEXUS_VERSION = 'nexus3'
-        JENKINS_API_TOKEN = credentials("JENKINS_API_TOKEN")
+    //    JENKINS_API_TOKEN = credentials("JENKINS_API_TOKEN")
     }
     stages {
         stage('Clean Workspace') {
@@ -57,31 +46,10 @@ pipeline {
         stage("Quality Gate") {
             steps {
                 script {
-                    waitForQualityGate abortPipeline: false, credentialsId: 'sonar-jenkins-token'
+                    waitForQualityGate abortPipeline: false, credentialsId: 'sonartoken'
                 }
             }
         }
-        // stage ('Publish to Nexus Repository Manager') {
-        //     steps {
-        //         nexusArtifactUploader (
-        //             nexusVersion: "${NEXUS_VERSION}",
-        //             protocol: "${NEXUS_PROTOCOL}",
-        //             nexusUrl: "${NEXUSIP}:${NEXUSPORT}",
-        //             groupId: "${NEXUS_REPOGRP_ID}",
-        //             version: "${env.BUILD_ID}-${env.BUILD_TIMESTAMP}",
-        //             repository: "${RELEASE_REPO}",
-        //             credentialsId: "${NEXUS_LOGIN}",
-        //             artifacts: [
-        //                 [
-        //                     artifactId: 'reddit-clone-app',
-        //                     classifier: '',
-        //                     file: 'target/reddit-clone-app.war',
-        //                     type: 'war'
-        //                 ]
-        //             ]
-        //         )
-        //     }
-        // }
         stage('Install Dependencies') {
             steps {
                 sh "npm install"
@@ -122,16 +90,16 @@ pipeline {
         }
         // Uncomment and configure the following stage if needed
 
-        stage("Trigger CD Pipeline") {
-            steps {
-                sh '''
-                curl -v -k --user admin:${JENKINS_API_TOKEN} -X POST \
-                -H 'cache-control: no-cache' -H 'content-type: application/x-www-form-urlencoded' \
-                --data 'IMAGE_TAG=${IMAGE_TAG}' \
-                '172.16.226.100:8080/job/Reddit-Clone-CD/buildWithParameters?token=gitops-token'
-                '''
-            }
-        }
+        // stage("Trigger CD Pipeline") {
+        //     steps {
+        //         sh '''
+        //         curl -v -k --user admin:${JENKINS_API_TOKEN} -X POST \
+        //         -H 'cache-control: no-cache' -H 'content-type: application/x-www-form-urlencoded' \
+        //         --data 'IMAGE_TAG=${IMAGE_TAG}' \
+        //         '172.16.226.100:8080/job/Reddit-Clone-CD/buildWithParameters?token=gitops-token'
+        //         '''
+        //     }
+        // }
 
     }
     post {

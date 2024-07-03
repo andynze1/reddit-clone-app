@@ -3,7 +3,7 @@
 sudo hostnamectl set-hostname jenkins-sonarqube
 
 sudo apt update -y
-sudo apt install wget curl unzip temurin-17-jdk -y
+sudo apt install wget curl unzip temurin-17-jdk fontconfig npm maven openjdk-11-jdk openjdk-8-jdk -y
 
 # Install AWSCLI
 curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
@@ -29,8 +29,9 @@ sudo usermod -aG docker ubuntu
 sudo usermod -aG docker jenkins  
 newgrp docker
 sudo chmod 777 /var/run/docker.sock
+sleep 10
 docker run -d --name sonar -p 9000:9000 sonarqube:lts-community
-docker run -d --name nexus -p 8081:8081 sonatypecommunity/nexus3
+docker run -d -p 8081:8081 --name nexus sonatype/nexus3
 
 
 #install trivy
