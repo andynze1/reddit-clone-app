@@ -17,7 +17,7 @@ pipeline {
         RELEASE = "1.0.0"
         DOCKER_USER = "andynze4"
         DOCKER_PASS = 'dockerhub'
-        IMAGE_NAME = "${DOCKER_USER}/${APP_NAME}"
+        IMAGE_NAME = "${DOCKER_USER}" + "/" + "${APP_NAME}"
         IMAGE_TAG = "${RELEASE}-${BUILD_NUMBER}"
         JENKINS_API_TOKEN = credentials("JENKINS_API_TOKEN")
     }
@@ -63,10 +63,12 @@ pipeline {
         stage("Build & Push Docker Image") {
             steps {
                 script {
-                    docker.withRegistry('', DOCKER_PASS) {
-                        def docker_image = docker.build("${IMAGE_NAME}")
-                        docker_image.push("${IMAGE_TAG}")
-                        docker_image.push('latest')
+                    docker.withRegistry('',DOCKER_PASS) {
+                         docker_image = docker.build "${IMAGE_NAME}"
+                     }
+                     docker.withRegistry('',DOCKER_PASS) {
+                         docker_image.push("${IMAGE_TAG}")
+                         docker_image.push('latest')
                     }
                 }
             }
@@ -82,10 +84,8 @@ pipeline {
         }
         stage ('Cleanup Artifacts') {
             steps {
-                sh '''
-                docker rmi ${IMAGE_NAME}:${IMAGE_TAG}
-                docker rmi ${IMAGE_NAME}:latest
-                '''
+                sh "docker rmi ${IMAGE_NAME}:${IMAGE_TAG}"
+                sh "docker rmi ${IMAGE_NAME}:latest"
             }
         }
         // Uncomment and configure the following stage if needed
