@@ -3,12 +3,15 @@
 sudo hostnamectl set-hostname jenkins-sonarqube
 
 sudo apt update -y
-sudo apt install wget curl unzip temurin-17-jdk fontconfig npm maven openjdk-11-jdk openjdk-8-jdk -y
+sudo apt install wget curl temurin-17-jdk fontconfig npm maven openjdk-11-jdk openjdk-8-jdk -y
 
 # Install AWSCLI
 curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+sudo apt install unzip
 unzip awscliv2.zip
 sudo ./aws/install
+aws --version
+
 
 # Install Jenkins
 wget -O - https://packages.adoptium.net/artifactory/api/gpg/key/public | tee /etc/apt/keyrings/adoptium.asc
