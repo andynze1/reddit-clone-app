@@ -120,18 +120,18 @@ pipeline {
             }
         }
         // Uncomment and configure the following stage if needed
-        /*
+
         stage("Trigger CD Pipeline") {
             steps {
                 sh '''
-                curl -v -k --user clouduser:${JENKINS_API_TOKEN} -X POST \
+                curl -v -k --user user1 -X POST \
                 -H 'cache-control: no-cache' -H 'content-type: application/x-www-form-urlencoded' \
                 --data 'IMAGE_TAG=${IMAGE_TAG}' \
-                'ec2-65-2-187-142.ap-south-1.compute.amazonaws.com:8080/job/Reddit-Clone-CD/buildWithParameters?token=gitops-token'
+                '172.16.226.100:8080/job/Reddit-Clone-CD/buildWithParameters?token=gitops-token'
                 '''
             }
         }
-        */
+
     }
     post {
         always {
