@@ -1,17 +1,10 @@
 #!/bin/bash
 
-sudo hostnamectl set-hostname jenkins-sonarqube
+
+sudo hostnamectl set-hostname integration-server
 
 sudo apt update -y
-sudo apt install wget curl temurin-17-jdk fontconfig npm maven openjdk-11-jdk openjdk-8-jdk -y
-
-# Install AWSCLI
-curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
-sudo apt install unzip
-unzip awscliv2.zip
-sudo ./aws/install
-aws --version
-
+sudo apt install wget curl fontconfig npm maven unzip openjdk-11-jdk openjdk-17-jdk -y
 
 # Install Jenkins
 wget -O - https://packages.adoptium.net/artifactory/api/gpg/key/public | tee /etc/apt/keyrings/adoptium.asc
@@ -25,17 +18,21 @@ sudo apt-get install jenkins -y
 sudo systemctl start jenkins
 sudo systemctl status jenkins
 
+sudo apt-get update -y
+
+curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+unzip awscliv2.zip
+sudo ./aws/install
+
 ##Install Docker and Run SonarQube as Container
 sudo apt-get update
-sudo apt-get install docker.io -y
-sudo usermod -aG docker ubuntu
-sudo usermod -aG docker jenkins  
+sudo apt install docker.io -y
+sudo usermod -aG docker ubuntusudo usermod -aG docker jenkins  
 newgrp docker
 sudo chmod 777 /var/run/docker.sock
 sleep 10
 docker run -d --name sonar -p 9000:9000 sonarqube:lts-community
 docker run -d -p 8081:8081 --name nexus sonatype/nexus3
-
 
 #install trivy
 sudo apt-get install wget apt-transport-https gnupg lsb-release -y
@@ -63,7 +60,7 @@ sudo ./get_helm.sh
 helm version
 
 
-
+#### Installing Nexus and Sonar on Virtual Machines
 # # Update system and install dependencies
 # sudo apt update -y
 # sudo apt upgrade -y

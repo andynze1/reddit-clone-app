@@ -1,7 +1,7 @@
 resource "aws_instance" "web" {
   ami                    = "ami-0e001c9271cf7f3b9"
   instance_type          = "t2.large"
-  key_name               = "aws-key1"
+  key_name               = aws_key_pair.linux-keypair.key_name
   vpc_security_group_ids = [aws_security_group.Jenkins-VM-SG.id]
   user_data              = templatefile("./install.sh", {})
 
@@ -40,4 +40,23 @@ resource "aws_security_group" "Jenkins-VM-SG" {
   tags = {
     Name = "Jenkins-VM-SG"
   }
+}
+# Create SSH RSA key of size 4096 bits
+resource "tls_private_key" "linux-keypair" {
+  algorithm = "RSA"
+  rsa_bits  = 4096
+}
+
+# Create AWS key pair using the public key
+resource "aws_key_pair" "linux-keypair" {
+  key_name   = "linux-keypair"
+  public_key = tls_private_key.linux-keypair.public_key_openssh
+}
+
+# Copy ssh key to local
+resource "local_file" "linux-pem-key" {
+  content         = tls_private_key.linux-keypair.private_key_pem
+  filename        = "linux-keypair.pem"
+  file_permission = "0400"
+  depends_on      = [tls_private_key.linux-keypair]
 }

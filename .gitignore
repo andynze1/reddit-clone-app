@@ -35,5 +35,7 @@ override.tf.json
 # Ignore CLI configuration files
 .terraformrc
 terraform.rc
-
+Jenkins-SonarQube-VM/*.pem
 package*
+
+*.pem
