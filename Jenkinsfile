@@ -19,7 +19,7 @@ pipeline {
         DOCKER_PASS = 'dockerhub'
         IMAGE_NAME = "${DOCKER_USER}" + "/" + "${APP_NAME}"
         IMAGE_TAG = "${RELEASE}-${BUILD_NUMBER}"
-        JENKINS_API_TOKEN = credentials("JENKINS_API_TOKEN")
+ //       JENKINS_API_TOKEN = credentials("JENKINS_API_TOKEN")
     }
     stages {
         stage('Clean Workspace') {
@@ -108,13 +108,13 @@ pipeline {
                     message: "*${currentBuild.currentResult}:* Job ${env.JOB_NAME} build ${env.BUILD_NUMBER} \nMore info at: ${env.BUILD_URL}"
                 )
             }
-            emailext attachLog: true,
-               subject: "'${currentBuild.result}'",
-               body: "Project: ${env.JOB_NAME}<br/>" +
-                   "Build Number: ${env.BUILD_NUMBER}<br/>" +
-                   "URL: ${env.BUILD_URL}<br/>",
-               to: 'andy.nze3@gmail.com',                              
-               attachmentsPattern: 'trivyfs.txt,trivyimage.txt'
+            // emailext attachLog: true,
+            //    subject: "'${currentBuild.result}'",
+            //    body: "Project: ${env.JOB_NAME}<br/>" +
+            //        "Build Number: ${env.BUILD_NUMBER}<br/>" +
+            //        "URL: ${env.BUILD_URL}<br/>",
+            //    to: 'andy.nze3@gmail.com',                              
+            //    attachmentsPattern: 'trivyfs.txt,trivyimage.txt'
         }
     }
 }  
