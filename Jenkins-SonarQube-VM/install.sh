@@ -16,7 +16,7 @@ echo deb [signed-by=/usr/share/keyrings/jenkins-keyring.asc] https://pkg.jenkins
 sudo apt-get update -y
 sudo apt-get install jenkins -y
 sudo systemctl start jenkins
-sudo systemctl status jenkins
+# sudo systemctl status jenkins
 
 sudo apt-get update -y
 
@@ -24,15 +24,34 @@ curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip
 unzip awscliv2.zip
 sudo ./aws/install
 
+# Add Docker's official GPG key:
+sudo apt-get update
+sudo apt-get install ca-certificates curl -y
+sudo install -m 0755 -d /etc/apt/keyrings
+sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc
+sudo chmod a+r /etc/apt/keyrings/docker.asc
+
+# Add the repository to Apt sources:
+echo \
+  "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu \
+  $(. /etc/os-release && echo "$VERSION_CODENAME") stable" | \
+  sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+
+sudo apt-get update
+
 ##Install Docker and Run SonarQube as Container
 sudo apt-get update
-sudo apt install docker.io -y
-sudo usermod -aG docker ubuntusudo usermod -aG docker jenkins  
+# sudo apt install docker.io docker-ce docker-compose -y
+sudo apt-get install docker-ce docker-ce-cli docker-compose containerd.io docker-buildx-plugin docker-compose-plugin -y
+sudo usermod -aG docker ubuntu 
+sudo usermod -aG docker jenkins  
+sudo usermod -aG docker $USER
 newgrp docker
 sudo chmod 777 /var/run/docker.sock
-sleep 10
-docker run -d --name sonar -p 9000:9000 sonarqube:lts-community
-docker run -d -p 8081:8081 --name nexus sonatype/nexus3
+bash
+
+# docker run -d --name sonar -p 9000:9000 sonarqube:lts-community
+# docker run -d -p 8081:8081 --name nexus sonatype/nexus3
 
 #install trivy
 sudo apt-get install wget apt-transport-https gnupg lsb-release -y
@@ -59,6 +78,79 @@ sudo chmod 700 get_helm.sh
 sudo ./get_helm.sh
 helm version
 
+sleep 30
+
+# Copy the docker-compose.yaml file to the VM
+cat <<EOT > /home/$USER/docker-compose.yaml
+version: '3.8'
+
+services:
+  nexus:
+    image: sonatypecommunity/nexus3
+    container_name: nexus
+    ports:
+      - "8081:8081"
+    volumes:
+      - nexus-data:/nexus-data
+    environment:
+      - INSTALL4J_ADD_VM_PARAMS=-Xms1200m -Xmx1200m
+    restart: unless-stopped
+
+  sonarqube:
+    image: sonarqube:lts-community
+    container_name: sonar
+    ports:
+      - "9000:9000"
+    volumes:
+      - sonarqube-conf:/opt/sonarqube/conf
+      - sonarqube-data:/opt/sonarqube/data
+      - sonarqube-logs:/opt/sonarqube/logs
+      - sonarqube-extensions:/opt/sonarqube/extensions
+    environment:
+      - SONARQUBE_JDBC_URL=jdbc:postgresql://db:5432/sonar
+      - SONARQUBE_JDBC_USERNAME=sonar
+      - SONARQUBE_JDBC_PASSWORD=sonar
+    depends_on:
+      - db
+    restart: unless-stopped
+
+  db:
+    image: postgres:13
+    container_name: sonarqube_db
+    environment:
+      - POSTGRES_USER=sonar
+      - POSTGRES_PASSWORD=sonar
+      - POSTGRES_DB=sonar
+    volumes:
+      - postgresql:/var/lib/postgresql/data
+    restart: unless-stopped
+
+  artifactory:
+    image: releases-docker.jfrog.io/jfrog/artifactory-pro:latest
+    container_name: artifactory
+    ports:
+      - "8081:8081"
+      - "8082:8082"
+    volumes:
+      - $JFROG_HOME/artifactory/var/:/var/opt/jfrog/artifactory
+    restart: unless-stopped
+
+volumes:
+  nexus-data:
+  sonarqube-conf:
+  sonarqube-data:
+  sonarqube-logs:
+  sonarqube-extensions:
+  postgresql:
+EOT
+
+# Start Docker containers
+sudo docker-compose -f /home/$USER/docker-compose.yaml up -d
+
+sleep 30
+
+sudo chmod 777 /var/run/docker.sock
+docker -v
 
 #### Installing Nexus and Sonar on Virtual Machines
 # # Update system and install dependencies
